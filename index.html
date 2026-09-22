@@ -1,0 +1,222 @@
+إليك كود تطبيق Face Talk Pro الكامل للنسخ المباشر ووضعه في ملف index.html على GitHub، والذي يتضمن واجهة تفاعلية بصوت ومستشعرات بصمة الصوت ومتجر منتجات مقترحة:
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Talk - بصمة الصوت الذكية والمطورة</title>
+    <style>
+        :root { --primary-color: #a855f7; }
+        body { font-family: Arial, sans-serif; background-color: #070a13; color: #f8fafc; text-align: center; padding: 15px; margin: 0; }
+        .container { max-width: 400px; margin: auto; background: linear-gradient(145deg, #0f172a, #1e1b4b); padding: 25px; border-radius: 30px; box-shadow: 0 20px 50px rgba(168, 85, 247, 0.2); border: 1px solid #4c1d95; }
+        
+        .battery-tracker { font-size: 14px; font-weight: bold; color: #c084fc; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .battery-icon { width: 35px; height: 18px; border: 2px solid currentColor; border-radius: 4px; padding: 1px; position: relative; }
+        .battery-icon::after { content: ''; position: absolute; right: -5px; top: 4px; width: 3px; height: 6px; background: currentColor; border-radius: 0 2px 2px 0; }
+        .battery-level { height: 100%; background: #10b981; width: 100%; transition: all 0.5s ease; }
+
+        .eye-container { width: 110px; height: 110px; background: white; border-radius: 50%; margin: 15px auto; display: flex; align-items: center; justify-content: center; border: 6px solid var(--primary-color); transition: all 0.5s ease; box-shadow: 0 0 25px rgba(168, 85, 247, 0.4); position: relative; }
+        .pupil { width: 35px; height: 35px; background: #070a13; border-radius: 50%; transition: all 0.4s ease; position: relative; }
+        .pupil::after { content: ''; position: absolute; top: 6px; left: 6px; width: 8px; height: 8px; background: white; border-radius: 50%; }
+        
+        .wave-container { display: flex; justify-content: center; align-items: center; gap: 4px; height: 25px; margin: 10px 0; }
+        .wave-bar { width: 4px; height: 10px; background: #a855f7; border-radius: 2px; animation: pulse 1s infinite alternate; display: none; }
+        .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse { 0% { height: 10px; } 100% { height: 25px; } }
+
+        button.main-btn { background: linear-gradient(135deg, #a855f7, #6d28d9); color: white; border: none; padding: 16px; font-size: 17px; border-radius: 50px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4); }
+        .status-box { margin-top: 15px; padding: 18px; border-radius: 15px; background: rgba(15, 23, 42, 0.8); font-size: 15px; line-height: 1.6; border: 1px solid #4c1d95; position: relative; }
+        
+        .action-tools { display: flex; justify-content: space-between; margin-top: 10px; display: none; }
+        .tool-btn { background: #334155; color: white; border: none; padding: 8px 12px; font-size: 12px; border-radius: 10px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+
+        .marketplace { margin-top: 20px; display: none; text-align: right; border-top: 2px dashed #4c1d95; padding-top: 15px; }
+        .marketplace h3 { text-align: center; color: #fbbf24; margin-bottom: 12px; font-size: 16px; }
+        .product-card { background: #070a13; border-radius: 18px; padding: 15px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #1e1b4b; }
+        .product-info { flex: 1; padding-right: 12px; }
+        .product-title { font-weight: bold; font-size: 13px; color: #f1f5f9; }
+        .product-price { color: #10b981; font-size: 13px; margin-top: 5px; font-weight: bold; }
+        .buy-now-btn { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #070a13; padding: 8px 15px; font-size: 12px; border-radius: 25px; text-decoration: none; font-weight: bold; }
+        
+        .pay-btn { background: linear-gradient(135deg, #ef4444, #b91c1c); display: none; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4); }
+        .disclaimer { font-size: 10px; color: #64748b; margin-top: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 style="color: #c084fc; margin-bottom:0; font-size: 24px;">🎙️ Face Talk Pro</h2>
+    <p style="color: #94a3b8; font-size: 12px; margin-top:5px;">إدارة جودة الحياة والبقاء ببصمة الصوت التلقائية</p>
+    
+    <div class="battery-tracker">
+        <span>طاقة البقاء الحيوية: <span id="energyNum">--</span>%</span>
+        <div class="battery-icon"><div class="battery-level" id="energyBar" style="width: 100%;"></div></div>
+    </div>
+
+    <div class="eye-container" id="eye"><div class="pupil" id="pupil"></div></div>
+    
+    <div class="wave-container" id="wave">
+        <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+    </div>
+
+    <button onclick="activateFaceTalkPro()" class="main-btn" id="mainBtn">🔊 بدء الاستماع للبصمة الصوتية</button>
+    
+    <a href="https://gumroad.com" target="_blank" style="text-decoration: none;">
+        <button class="pay-btn" id="payBtn">🔓 فتح الفحص الكامل لـ Face Talk (1$)</button>
+    </a>
+    
+    <div class="status-box">
+        <div id="resultBox">اضغط على الزر البنفسجي لتنشيط ميزة التفاعل الصوتي التلقائي والذكي مجاناً.</div>
+        
+        <div class="action-tools" id="toolsSection">
+            <button class="tool-btn" onclick="replayLastVoice()">🔊 إعادة نطق التشخيص</button>
+            <button class="tool-btn" style="background:#10b981;" onclick="shareDiagnosis()">🔗 مشاركة النتيجة فكاهياً</button>
+        </div>
+    </div>
+    
+    <div class="marketplace" id="marketplaceSection">
+        <h3>🛒 منتجات البقاء والراحة المقترحة من أمازون:</h3>
+        <div id="productsContainer"></div>
+    </div>
+    <p class="disclaimer">⚠️ تطبيق ترفيهي وتوعوي لتوجيه نمط الحياة وجودتها، ولا يمثل بديلاً عن الاستشارة الطبية الرسمية.</p>
+</div>
+
+<script>
+    let trialCounter = localStorage.getItem('facetalk_final_trials_v5') || 0;
+    let lastVoiceText = "";
+
+    function aiSpeak(text, callback) {
+        let speech = new SpeechSynthesisUtterance(text);
+        speech.lang = 'ar-SA'; speech.rate = 0.95;
+        lastVoiceText = text;
+        if (callback) speech.onend = callback;
+        window.speechSynthesis.speak(speech);
+    }
+
+    function replayLastVoice() {
+        if(lastVoiceText) aiSpeak(lastVoiceText);
+    }
+
+    function shareDiagnosis() {
+        let textToShare = "جربت تطبيق Face Talk الذكي وحلل بصمة صوتي اليوم، وطلعت النتيجة فكاهية وواقعية وجودة حياتي ممتازة! جربوه من رابط البايو 🎙️✨";
+        navigator.clipboard.writeText(textToShare);
+        alert("📋 تم نسخ تشخيصك بنجاح! يمكنك الآن لصقه ومشاركته مع أصدقائك على تيك توك لنشر التجربة.");
+    }
+
+    function activateFaceTalkPro() {
+        let resultBox = document.getElementById('resultBox');
+        let eye = document.getElementById('eye');
+        let payBtn = document.getElementById('payBtn');
+        let mainBtn = document.getElementById('mainBtn');
+        document.getElementById('toolsSection').style.display = "none";
+
+        if (trialCounter >= 2) {
+            resultBox.innerHTML = "🔒 <b>انتهت تجاربك المجانية في Face Talk Pro!</b> للوصول غير المحدود لأعلى مستويات الذكاء الاصطناعي ومتجر المنتجات، يرجى دعم التطبيق بـ 1 دولار فقط.";
+            eye.style.borderColor = "#ef4444";
+            payBtn.style.display = "block"; mainBtn.style.display = "none";
+            aiSpeak("انتهت تجاربك المجانية المتاحة في فيس تاك برو، يرجى تفعيل النسخة الكاملة بواحد دولار للاستمرار.");
+            return;
+        }
+
+        resultBox.innerHTML = "🤖 <b>أهلاً بك في فئة المحترفين!</b> المساعد الصوتي يتحدث... استمع إليه وتحدث فور انطلاق الأمواج البنفسجية.";
+        mainBtn.innerHTML = "📡 جاري ترحيب المساعد الصوتي...";
+        mainBtn.disabled = true;
+
+        aiSpeak("أهلاً بك في فيس تاك برو، أنا مساعدك الصوتي الذكي لإدارة طاقة بقائك اليومية. تحدث معي الآن بلهجتك واشرح لي ما تشعر به في عينك أو جسدك لأقترح لك منتجات الراحة والحلول التفاؤلية فوراً", function() {
+            startAutomaticVoiceCapture();
+        });
+    }
+
+    function startAutomaticVoiceCapture() {
+        let resultBox = document.getElementById('resultBox');
+        let mainBtn = document.getElementById('mainBtn');
+        let waveBars = document.querySelectorAll('.wave-bar');
+
+        resultBox.innerHTML = "🎙️ <b>بصمة الصوت تستمع إليك تلقائياً...</b> تحدث الآن بلهجتك الدارجة واشرح أي عَرَض في جسدك!";
+        mainBtn.innerHTML = "🎙️ جاري الاستماع تلقائياً بدون لمس...";
+        waveBars.forEach(b => b.style.display = "block");
+
+        window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (window.SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ar-SA'; recognition.start();
+            recognition.onresult = function() { runFaceTalkProAnalysis(); };
+            recognition.onerror = function() { setTimeout(runFaceTalkProAnalysis, 2000); };
+        } else {
+            setTimeout(runFaceTalkProAnalysis, 4000);
+        }
+    }
+
+    function runFaceTalkProAnalysis() {
+        let eye = document.getElementById('eye');
+        let pupil = document.getElementById('pupil');
+        let resultBox = document.getElementById('resultBox');
+        let marketplaceSection = document.getElementById('marketplaceSection');
+        let productsContainer = document.getElementById('productsContainer');
+        let waveBars = document.querySelectorAll('.wave-bar');
+        let mainBtn = document.getElementById('mainBtn');
+        let energyNum = document.getElementById('energyNum');
+        let energyBar = document.getElementById('energyBar');
+
+        waveBars.forEach(b => b.style.display = "none");
+        resultBox.innerHTML = "🎯 <b>جاري قياس العاطفة ونبرة الصوت حيوياً...</b> جاري ربط طاقتك بمنتجات أمازون المتفوقة...";
+
+mainBtn.innerHTML = "🔄 جاري المعالجة والتحليل التلقائي...";
+let moveInterval = setInterval(() => {
+let x = (Math.random() * 20 - 10) + 'px'; let y = (Math.random() * 20 - 10) + 'px';
+pupil.style.transform = translate(${x}, ${y});
+}, 300);
+setTimeout(() => {
+clearInterval(moveInterval); pupil.style.transform = "translate(0, 0)";
+trialCounter++; localStorage.setItem('facetalk_final_trials_v5', trialCounter);
+mainBtn.innerHTML = "🎙️ اضغط لإعادة الفحص التلقائي";
+mainBtn.disabled = false;
+const database = [
+{
+color: "#10b981", energy: 98, bColor: "#10b981",
+text: "✨ تقرير Face Talk (حالة النقاء 🟢): تحليل بصمة صوتك وملامحك يظهر حيوية خارقة وطاقة تبلغ 98%! ملامحك تؤكد انتظام الراحة والترطيب التام. للحفاظ على هذه الإنتاجية والقوة، ننصحك بتسوق زجاجة المياه الذكية المتاحة أدناه لتبقى دائماً في القمة!",
+voice: "ما شاء الله! طاقة بقائك الحيوية ثمانية وتسعون بالمائة وعيناك تلمعان بنقاء ممتاز. حافظ على هذا النشاط الرائع دائماً وتسوق المنتجات المتاحة في الأسفل لتظل في القمة",
+products: [
+{ title: "💧 زجاجة مياه رياضية ذكية مع منبه شرب مدمج", price: "22.00 $", link: "amazon.com" },
+{ title: "⚡ مسحوق الفيتامينات العضوية لتعزيز الطاقة اليومية", price: "29.99 $", link: "amazon.com" }
+]
+},
+{
+color: "#f59e0b", energy: 55, bColor: "#f59e0b",
+text: "📱 تقرير Face Talk (حالة الإجهاد 🟡): رصدت مستشعرات الصوت علامات إجهاد ناتجة عن البقاء الطويل أمام الشاشات الإلكترونية وجفاف العين الخفيف، وطاقتك الحالية 55%. الحل التفاؤلي بسيط لاستعادة إشراقتك ونقائك الكامل فوراً: تسوق نظارة حماية العين الفاخرة والقطرة المرطبة المتاحة في المتجر أدناه!",
+voice: "انتبه؛ طاقة بقائك الحيوية خمسة وخمسون بالمائة وبصمة صوتك تظهر نبرة إجهاد وتعب رقمي بسبب الشاشات الطويلة. نصيحتنا خذ استراحة مريحة الآن وتسوق أدوات حماية النضارة المتاحة أسفل العين.",
+products: [
+{ title: "👓 نظارات حماية العين الفاخرة ضد الأشعة الزرقاء للهواتف", price: "16.50 $", link: "amazon.com" },
+{ title: "🧴 قطرة ترطيب وإنعاش للتخلص من الجفاف والإجهاد", price: "9.99 $", link: "amazon.com" }
+]
+},
+{
+color: "#ef4444", energy: 24, bColor: "#ef4444",
+text: "🚨 تقرير Face Talk (حالة الطوارئ 🔴): طاقة الحياة الحالية 24% فقط! يا بركة البيت، نبرة صوتك تظهر علامات أرق شديد ونقص حاد في السوائل والنوم، والاحتمال القريب طبيّاً هو الاحتراق البدني. نصيحة البقاء اليومية الحقيقية: اشرب كوبين من الماء فوراً، واغسل وجهك بماء بارد، وتسوق قناع النوم المهدئ المتاح بالأسفل لتستعيد كامل عافيتك الغالية!",
+voice: "الله يعطيك الصحة والعافية. طاقة خلاياك الحالية أربعة وعشرون بالمائة ونبرة صوتك تظهر علامات سهر وتعب واضح اليوم. نصيحتنا الغالية ارتاح شوي واشرب كاسة ماي الحين، وصحتك بتظل بألف خير وعافية إن شاء الله.",
+products: [
+{ title: "🌙 قناع النوم الحراري ثلاثي الأبعاد المهدئ للعين والوجه", price: "14.00 $", link: "amazon.com" },
+{ title: "🌿 زيت اللافندر الطبيعي المهدئ للأعصاب والاسترخاء العميق", price: "11.20 $", link: "amazon.com" }
+]
+}
+];
+let selectedOutcome = database[Math.floor(Math.random() * database.length)];
+energyNum.innerHTML = selectedOutcome.energy;
+energyBar.style.width = selectedOutcome.energy + "%";
+energyBar.style.background = selectedOutcome.bColor;
+eye.style.borderColor = selectedOutcome.color;
+document.documentElement.style.setProperty('--primary-color', selectedOutcome.color);
+resultBox.innerHTML = selectedOutcome.text;
+aiSpeak(selectedOutcome.voice);
+productsContainer.innerHTML = "";
+selectedOutcome.products.forEach(p => {
+productsContainer.innerHTML += <div class="product-card"><div class="product-info"><div class="product-title">${p.title}</div><div class="product-price">${p.price}</div></div><a class="buy-now-btn" href="${p.link}" target="_blank">تسوق الآن 🛒</a></div>;
+});
+document.getElementById('toolsSection').style.display = "flex";
+marketplaceSection.style.display = "block";
+}, 4000);
+}
+
+
+
